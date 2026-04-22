@@ -1,0 +1,53 @@
+.admin-page { max-width: 1200px; }
+.admin-header { margin-bottom: var(--space-2xl); }
+.admin-header h2 { margin-bottom: var(--space-xs); }
+.admin-header p { color: var(--text-tertiary); font-size: var(--font-sm); }
+
+.admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-lg); margin-bottom: var(--space-2xl); }
+.admin-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-lg); }
+.admin-grid .full-width { grid-column: 1 / -1; }
+.admin-grid h3 { font-size: var(--font-lg); margin-bottom: var(--space-xl); display: flex; align-items: center; gap: var(--space-sm); }
+
+/* Chart */
+.admin-chart { display: flex; align-items: flex-end; gap: var(--space-lg); height: 200px; padding-top: var(--space-lg); }
+.admin-bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: var(--space-sm); height: 100%; justify-content: flex-end; }
+.admin-bar { width: 100%; max-width: 40px; background: linear-gradient(180deg, var(--primary), var(--primary-dark)); border-radius: var(--radius-sm) var(--radius-sm) 0 0; transition: height 0.5s ease; }
+.admin-bar-col span { font-size: var(--font-xs); color: var(--text-muted); }
+
+/* Pie */
+.admin-pie-legend { display: flex; align-items: center; gap: var(--space-2xl); justify-content: center; }
+.admin-legend { display: flex; flex-direction: column; gap: var(--space-md); }
+.admin-legend-item { display: flex; align-items: center; gap: var(--space-sm); font-size: var(--font-sm); color: var(--text-secondary); }
+.legend-dot { width: 12px; height: 12px; border-radius: var(--radius-full); }
+
+/* Table */
+.admin-table { overflow-x: auto; }
+.admin-table-header, .admin-table-row {
+  display: grid; grid-template-columns: 1.5fr 2fr 1fr 1fr 1fr;
+  gap: var(--space-md); padding: var(--space-md) var(--space-lg);
+  align-items: center; font-size: var(--font-sm);
+}
+.admin-table-header { font-weight: var(--weight-semibold); color: var(--text-tertiary); border-bottom: 1px solid var(--border); text-transform: uppercase; font-size: var(--font-xs); letter-spacing: 0.05em; }
+.admin-table-row { border-bottom: 1px solid var(--border); color: var(--text-secondary); transition: background var(--transition-fast); }
+.admin-table-row:last-child { border-bottom: none; }
+.admin-table-row:hover { background: var(--surface); }
+.admin-user-name { color: var(--text-primary); font-weight: var(--weight-medium); }
+.admin-user-email { color: var(--text-tertiary); }
+
+/* Reports */
+.admin-reports { display: flex; flex-direction: column; gap: var(--space-lg); }
+.admin-report-item { padding: var(--space-lg); background: var(--surface); border-radius: var(--radius-md); }
+.admin-report-item p { font-size: var(--font-sm); color: var(--text-secondary); margin: var(--space-md) 0; }
+.admin-report-meta { display: flex; justify-content: space-between; font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-md); }
+.admin-report-actions { display: flex; gap: var(--space-sm); }
+
+/* Health */
+.admin-health { display: flex; flex-direction: column; gap: var(--space-md); }
+.admin-health-item { display: flex; justify-content: space-between; padding: var(--space-md); background: var(--surface); border-radius: var(--radius-md); }
+.admin-health-label { font-size: var(--font-sm); color: var(--text-tertiary); }
+.admin-health-item strong { font-size: var(--font-sm); }
+
+@media (max-width: 1024px) {
+  .admin-stats { grid-template-columns: repeat(2, 1fr); }
+  .admin-grid { grid-template-columns: 1fr; }
+}

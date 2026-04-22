@@ -1,0 +1,33 @@
+.nutritionists-page { max-width: 1100px; }
+.nut-header { margin-bottom: var(--space-2xl); }
+.nut-header h2 { margin-bottom: var(--space-xs); }
+.nut-header p { color: var(--text-tertiary); font-size: var(--font-sm); }
+
+.nut-controls { margin-bottom: var(--space-xl); }
+.nut-search { position: relative; max-width: 500px; margin-bottom: var(--space-lg); }
+.nut-search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.nut-search input { padding-left: 42px; }
+.nut-specs { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+
+.nut-results { margin-bottom: var(--space-lg); }
+.nut-count { font-size: var(--font-sm); color: var(--text-tertiary); }
+
+.nut-grid { display: flex; flex-direction: column; gap: var(--space-lg); }
+
+.nut-card { }
+.nut-card-top { display: flex; align-items: flex-start; gap: var(--space-lg); margin-bottom: var(--space-lg); }
+.nut-card-info { flex: 1; }
+.nut-name-row { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-xs); flex-wrap: wrap; }
+.nut-name-row h3 { font-size: var(--font-lg); }
+.nut-title { font-size: var(--font-sm); color: var(--text-tertiary); margin-bottom: var(--space-sm); }
+.nut-meta { display: flex; gap: var(--space-lg); font-size: var(--font-xs); color: var(--text-tertiary); flex-wrap: wrap; }
+.nut-meta span { display: flex; align-items: center; gap: var(--space-xs); }
+
+.nut-bio { font-size: var(--font-sm); color: var(--text-secondary); margin-bottom: var(--space-lg); line-height: var(--leading-relaxed); }
+.nut-card-tags { display: flex; flex-wrap: wrap; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+
+.nut-card-bottom { display: flex; align-items: center; gap: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--border); }
+.nut-price strong { font-size: var(--font-xl); color: var(--primary-light); }
+.nut-price span { font-size: var(--font-sm); color: var(--text-tertiary); }
+.nut-consult-types { display: flex; gap: var(--space-sm); flex: 1; }
+.nut-type-icon { width: 32px; height: 32px; border-radius: var(--radius-md); background: var(--surface); display: flex; align-items: center; justify-content: center; color: var(--text-secondary); font-size: var(--font-sm); }

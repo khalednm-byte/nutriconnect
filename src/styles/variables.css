@@ -1,0 +1,128 @@
+/* ============================================
+   NutriConnect — Design Tokens & CSS Variables
+   ============================================ */
+
+:root {
+  /* ---- Primary Colors ---- */
+  --primary: #2D9F6F;
+  --primary-light: #4EBF8F;
+  --primary-lighter: #6FD4A8;
+  --primary-dark: #1A7A4F;
+  --primary-darker: #0F5C39;
+  --primary-glow: rgba(45, 159, 111, 0.4);
+
+  /* ---- Secondary / Accent ---- */
+  --secondary: #F5A623;
+  --secondary-light: #FFBE4D;
+  --secondary-dark: #D48E1A;
+  --accent: #E8735A;
+  --accent-light: #FF8F7A;
+  --accent-dark: #C4573F;
+  --info: #4A9FE8;
+  --info-light: #6BB5F0;
+
+  /* ---- Backgrounds (Dark Theme) ---- */
+  --bg-primary: #0B1410;
+  --bg-secondary: #101D16;
+  --bg-tertiary: #162118;
+  --bg-elevated: #1C2C22;
+  --bg-hover: #213428;
+
+  /* ---- Surfaces ---- */
+  --surface: #1E3026;
+  --surface-hover: #24392D;
+  --surface-active: #2A4535;
+
+  /* ---- Glass Effects ---- */
+  --glass-bg: rgba(30, 48, 38, 0.6);
+  --glass-border: rgba(78, 191, 143, 0.12);
+  --glass-glow: rgba(45, 159, 111, 0.06);
+
+  /* ---- Text ---- */
+  --text-primary: #F0F7F2;
+  --text-secondary: #9ABFA8;
+  --text-tertiary: #6A9A7D;
+  --text-muted: #4A7A60;
+  --text-inverse: #0B1410;
+
+  /* ---- Borders ---- */
+  --border: #1E3026;
+  --border-light: #2A4535;
+  --border-focus: #2D9F6F;
+
+  /* ---- Status Colors ---- */
+  --success: #2D9F6F;
+  --warning: #F5A623;
+  --error: #E8735A;
+  --online: #4EBF8F;
+
+  /* ---- Spacing Scale ---- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 12px;
+  --space-lg: 16px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 48px;
+  --space-4xl: 64px;
+  --space-5xl: 96px;
+
+  /* ---- Typography ---- */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-xs: 0.75rem;      /* 12px */
+  --font-sm: 0.875rem;     /* 14px */
+  --font-base: 1rem;        /* 16px */
+  --font-lg: 1.125rem;     /* 18px */
+  --font-xl: 1.25rem;      /* 20px */
+  --font-2xl: 1.5rem;      /* 24px */
+  --font-3xl: 2rem;        /* 32px */
+  --font-4xl: 3rem;        /* 48px */
+  --font-5xl: 4rem;        /* 64px */
+
+  --weight-light: 300;
+  --weight-normal: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* ---- Border Radius ---- */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(45, 159, 111, 0.15);
+  --shadow-glow-strong: 0 0 50px rgba(45, 159, 111, 0.25);
+
+  /* ---- Transitions ---- */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* ---- Z-Index Scale ---- */
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-overlay: 400;
+  --z-modal: 500;
+  --z-toast: 600;
+
+  /* ---- Layout ---- */
+  --sidebar-width: 260px;
+  --sidebar-collapsed: 72px;
+  --topbar-height: 64px;
+  --max-content: 1200px;
+}
