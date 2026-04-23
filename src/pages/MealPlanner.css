@@ -186,3 +186,29 @@
   padding: var(--space-lg) var(--space-xl);
   border-top: 1px solid var(--border);
 }
+
+/* ── Empty meal slot ── */
+.meal-empty { border: 2px dashed var(--border); background: transparent; }
+.meal-empty .planner-meal-header { opacity: 0.6; }
+.planner-meal-empty {
+  display: flex; flex-direction: column; align-items: center;
+  gap: var(--space-sm); padding: var(--space-xl) 0;
+  color: var(--text-muted);
+}
+.meal-empty-icon { font-size: 32px; opacity: 0.4; }
+.meal-empty-label { font-size: var(--font-xs); }
+
+/* ── Clear meal button ── */
+.meal-clear-btn {
+  margin-left: auto; background: none; border: none; cursor: pointer;
+  color: var(--text-muted); padding: var(--space-xs);
+  border-radius: var(--radius-sm); display: flex; align-items: center;
+  font-size: 14px; opacity: 0;
+  transition: opacity var(--transition-fast), color var(--transition-fast);
+}
+.planner-meal-card:hover .meal-clear-btn { opacity: 1; }
+.meal-clear-btn:hover { color: var(--danger, #e8735a); }
+
+/* ── Macros notes ── */
+.macros-note { font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-lg); }
+.macros-estimated-note { font-size: var(--font-xs); color: var(--text-muted); margin-top: var(--space-lg); }

@@ -1,6 +1,38 @@
 import { createContext, useContext, useState, useCallback } from 'react';
-import { currentUser } from '../data/users';
-import axios from 'axios';
+
+// Hardcoded here to avoid Vite module caching issues during development.
+// When the backend is built, login() will be replaced with an API call
+// and this object goes away entirely.
+const devUser = {
+  id: 'u1',
+  name: 'Alex Morgan',
+  email: 'alex@nutriconnect.com',
+  avatar: null,
+  role: 'admin',
+  subscription: 'premium',
+  assignedNutritionist: { id: 'n1', userId: 'nu1', name: 'Dr. Emily Roberts' },
+  profile: {
+    bio: 'Fitness enthusiast on a journey to better health 💪',
+    goals: ['weight_loss', 'muscle_gain'],
+    dietPreferences: ['high_protein', 'low_carb'],
+    allergies: ['gluten'],
+    currentWeight: 78,
+    targetWeight: 72,
+    height: 178,
+    age: 28,
+  },
+  stats: {
+    followers: 156,
+    following: 89,
+    postsCount: 42,
+    streak: 14,
+    badges: ['early_adopter', '7_day_streak', 'first_post', 'recipe_master'],
+    points: 2480,
+    level: 12,
+  },
+  notifications: 5,
+  createdAt: '2025-11-15T08:00:00Z',
+};
 
 const AuthContext = createContext(null);
 
@@ -8,33 +40,16 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = useCallback(async (email, password) => {
-    try {
-      const res = await axios.post('/api/auth/login', { email, password });
-      if (res.data.success) {
-        setUser(res.data.user);
-        setIsAuthenticated(true);
-        // We could store the token in localStorage here: localStorage.setItem('token', res.data.token)
-        return true;
-      }
-    } catch (error) {
-      console.error('Login failed:', error.response?.data?.error || error.message);
-      return false;
-    }
+  const login = useCallback((email, password) => {
+    setUser(devUser);
+    setIsAuthenticated(true);
+    return true;
   }, []);
 
-  const register = useCallback(async (data) => {
-    try {
-      const res = await axios.post('/api/auth/register', data);
-      if (res.data.success) {
-        setUser(res.data.user);
-        setIsAuthenticated(true);
-        return true;
-      }
-    } catch (error) {
-      console.error('Registration failed:', error.response?.data?.error || error.message);
-      return false;
-    }
+  const register = useCallback((data) => {
+    setUser({ ...devUser, ...data });
+    setIsAuthenticated(true);
+    return true;
   }, []);
 
   const logout = useCallback(() => {

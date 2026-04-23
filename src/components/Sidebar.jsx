@@ -24,13 +24,13 @@ const navItems = [
 
 const bottomItems = [
   { path: '/profile', icon: FiUser, label: 'Profile' },
-  { path: '/admin', icon: FiShield, label: 'Admin' },
 ];
 
 export default function Sidebar({ collapsed, onToggle }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const isAdmin = user?.role === 'admin';
 
   const handleLogout = () => {
     logout();
@@ -84,6 +84,17 @@ export default function Sidebar({ collapsed, onToggle }) {
                 {!collapsed && <span className="nav-label">{item.label}</span>}
               </Link>
             ))}
+            {/* Admin link — only visible to admins */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`nav-item ${location.pathname === '/admin' ? 'active' : ''}`}
+                title={collapsed ? 'Admin' : undefined}
+              >
+                <FiShield className="nav-icon" />
+                {!collapsed && <span className="nav-label">Admin</span>}
+              </Link>
+            )}
             <button className="nav-item logout-btn" onClick={handleLogout}>
               <FiLogOut className="nav-icon" />
               {!collapsed && <span className="nav-label">Logout</span>}

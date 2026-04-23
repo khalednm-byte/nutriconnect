@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { weeklyMealPlan, recipes } from '../data/meals';
-import { FiPlus, FiX, FiCheck, FiClock, FiUser, FiArrowRight, FiSearch } from 'react-icons/fi';
+import { FiPlus, FiX, FiCheck, FiClock, FiUser, FiArrowRight, FiSearch, FiTrash2 } from 'react-icons/fi';
 import './MealPlanner.css';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -19,8 +19,8 @@ const statusStyle = {
 
 export default function MealPlanner() {
   const { user } = useAuth();
-  const isPremium = user?.subscription === 'premium' || user?.subscription === 'pro';
-  const nutritionist = user?.assignedNutritionist;
+  const isPremium = (user?.subscription === 'premium' || user?.subscription === 'pro') && user?.role !== 'admin';
+  const nutritionist = isPremium ? user?.assignedNutritionist : null;
 
   const [selectedDay, setSelectedDay]   = useState('Monday');
   const [plan, setPlan]                 = useState(weeklyMealPlan);
@@ -37,9 +37,32 @@ export default function MealPlanner() {
   // --- Confirmation toast ---
   const [toast, setToast]               = useState(null); // { message, type }
 
-  const dayPlan    = plan[selectedDay];
-  const dailyCals  = Object.values(dayPlan).reduce((sum, m) => sum + m.calories, 0);
-  const dailyGoal  = 2200;
+  const dayPlan   = plan[selectedDay];
+  const dailyGoal = 2200;
+
+  // Build a lookup map from recipe id → recipe object for O(1) access
+  const recipeMap = useMemo(() =>
+    Object.fromEntries(recipes.map(r => [r.id, r])),
+  []);
+
+  // Compute calories and macros dynamically from whatever is in the plan.
+  // Null slots (cleared meals) contribute nothing.
+  // Snacks without a mealId have calories but no macro data — we count
+  // their calories and treat their macros as 0 until real data exists.
+  const dailyNutrition = useMemo(() => {
+    return Object.values(dayPlan).reduce((totals, meal) => {
+      if (!meal) return totals; // empty slot — skip
+      const recipe = meal.mealId ? recipeMap[meal.mealId] : null;
+      return {
+        calories: totals.calories + (meal.calories || 0),
+        protein:  totals.protein  + (recipe?.macros?.protein || 0),
+        carbs:    totals.carbs    + (recipe?.macros?.carbs   || 0),
+        fat:      totals.fat      + (recipe?.macros?.fat     || 0),
+      };
+    }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  }, [dayPlan, recipeMap]);
+
+  const dailyCals = dailyNutrition.calories;
 
   const filteredRecipes = recipes.filter(r =>
     r.name.toLowerCase().includes(recipeSearch.toLowerCase())
@@ -56,6 +79,16 @@ export default function MealPlanner() {
     setSwapTarget(null);
     setSelectedRecipe(null);
     setRecipeSearch('');
+  };
+
+  // --- Clear a meal slot (set to null) ---
+  // The day selector and macro calculator both handle null gracefully.
+  const clearMeal = (day, type) => {
+    setPlan(prev => ({
+      ...prev,
+      [day]: { ...prev[day], [type]: null },
+    }));
+    showToast(`${type.charAt(0).toUpperCase() + type.slice(1)} removed.`);
   };
 
   const showToast = (message, type = 'success') => {
@@ -156,7 +189,7 @@ export default function MealPlanner() {
             onClick={() => setSelectedDay(day)}
           >
             <span className="day-short">{day.slice(0, 3)}</span>
-            <span className="day-cal">{Object.values(plan[day]).reduce((s, m) => s + m.calories, 0)} cal</span>
+            <span className="day-cal">{Object.values(plan[day]).reduce((s, m) => s + (m?.calories || 0), 0)} cal</span>
           </button>
         ))}
       </div>
@@ -165,27 +198,50 @@ export default function MealPlanner() {
       <div className="planner-meals">
         {mealTypes.map(type => {
           const meal = dayPlan[type];
+          const isEmpty = meal === null;
+
           return (
-            <div key={type} className="planner-meal-card card">
+            <div key={type} className={`planner-meal-card card ${isEmpty ? 'meal-empty' : ''}`}>
               <div className="planner-meal-header">
                 <span className="planner-meal-icon">{mealIcon[type]}</span>
                 <h4>{type.charAt(0).toUpperCase() + type.slice(1)}</h4>
+                {/* Clear button — only shown when the slot has a meal */}
+                {!isEmpty && (
+                  <button
+                    className="meal-clear-btn"
+                    onClick={() => clearMeal(selectedDay, type)}
+                    title="Remove meal"
+                  >
+                    <FiTrash2 />
+                  </button>
+                )}
               </div>
-              <div className="planner-meal-body">
-                <div className="planner-meal-plate">
-                  <span className="plate-emoji">{plateEmoji[type]}</span>
+
+              {isEmpty ? (
+                /* ── Empty slot ── */
+                <div className="planner-meal-empty">
+                  <span className="meal-empty-icon">🚫</span>
+                  <span className="meal-empty-label">No meal planned</span>
                 </div>
-                <div className="planner-meal-info">
-                  <strong>{meal.name}</strong>
-                  <span className="planner-meal-cal">{meal.calories} calories</span>
+              ) : (
+                /* ── Filled slot ── */
+                <div className="planner-meal-body">
+                  <div className="planner-meal-plate">
+                    <span className="plate-emoji">{plateEmoji[type]}</span>
+                  </div>
+                  <div className="planner-meal-info">
+                    <strong>{meal.name}</strong>
+                    <span className="planner-meal-cal">{meal.calories} calories</span>
+                  </div>
                 </div>
-              </div>
+              )}
+
               <button
-                className="btn btn-ghost btn-sm"
+                className={`btn btn-sm ${isEmpty ? 'btn-primary' : 'btn-ghost'}`}
                 style={{ width: '100%', marginTop: 'var(--space-md)' }}
                 onClick={() => openSwapModal(selectedDay, type)}
               >
-                <FiPlus /> {isPremium && nutritionist ? 'Request Swap' : 'Swap Meal'}
+                <FiPlus /> {isEmpty ? 'Add Meal' : (isPremium && nutritionist ? 'Request Swap' : 'Swap Meal')}
               </button>
             </div>
           );
@@ -195,24 +251,26 @@ export default function MealPlanner() {
       {/* ── Macro Summary ── */}
       <div className="planner-macros card">
         <h3>Daily Macros Estimate</h3>
+        <p className="macros-note">Calculated from meals with recipe data. Snacks without recipes are excluded from macros.</p>
         <div className="planner-macro-bars">
           {[
-            { label: 'Protein', value: 135, target: 150, unit: 'g', color: 'var(--primary)' },
-            { label: 'Carbs',   value: 210, target: 250, unit: 'g', color: 'var(--secondary)' },
-            { label: 'Fat',     value: 55,  target: 65,  unit: 'g', color: 'var(--accent)' },
-            { label: 'Fiber',   value: 24,  target: 30,  unit: 'g', color: 'var(--info)' },
+            { label: 'Protein', value: dailyNutrition.protein, target: 150, unit: 'g', color: 'var(--primary)' },
+            { label: 'Carbs',   value: dailyNutrition.carbs,   target: 250, unit: 'g', color: 'var(--secondary)' },
+            { label: 'Fat',     value: dailyNutrition.fat,     target: 65,  unit: 'g', color: 'var(--accent)' },
+            { label: 'Fiber',   value: 24,                     target: 30,  unit: 'g', color: 'var(--info)', estimated: true },
           ].map(m => (
             <div key={m.label} className="planner-macro-item">
               <div className="planner-macro-header">
-                <span>{m.label}</span>
+                <span>{m.label}{m.estimated ? ' *' : ''}</span>
                 <span>{m.value}{m.unit} / {m.target}{m.unit}</span>
               </div>
               <div className="progress-bar">
-                <div className="progress-bar-fill" style={{ width: `${(m.value / m.target) * 100}%`, background: m.color }} />
+                <div className="progress-bar-fill" style={{ width: `${Math.min((m.value / m.target) * 100, 100)}%`, background: m.color }} />
               </div>
             </div>
           ))}
         </div>
+        <p className="macros-estimated-note">* Fiber is estimated — recipe data does not include fiber values yet.</p>
       </div>
 
       {/* ── Pending Tickets (premium only) ── */}
@@ -266,7 +324,10 @@ export default function MealPlanner() {
                   {isPremium && nutritionist ? 'Request Meal Swap' : 'Swap Meal'}
                 </h3>
                 <p className="modal-subtitle">
-                  Replacing <strong>{swapTarget.currentMeal.name}</strong> on {swapTarget.day}
+                  {swapTarget.currentMeal
+                    ? <>Replacing <strong>{swapTarget.currentMeal.name}</strong> on {swapTarget.day}</>
+                    : <>Adding a meal for {swapTarget.type} on {swapTarget.day}</>
+                  }
                 </p>
               </div>
               <button className="modal-close" onClick={closeModal}><FiX /></button>

@@ -7,7 +7,7 @@ export const currentUser = {
   name: 'Alex Morgan',
   email: 'alex@nutriconnect.com',
   avatar: null,
-  role: 'user',
+  role: 'admin',
   subscription: 'premium',
   assignedNutritionist: { id: 'n1', userId: 'nu1', name: 'Dr. Emily Roberts' },
   profile: {
