@@ -1,147 +1,107 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiUser, FiMail, FiLock, FiTarget, FiArrowRight, FiArrowLeft } from 'react-icons/fi';
-
-const goals = ['Weight Loss', 'Muscle Gain', 'Better Health', 'More Energy', 'Sports Performance', 'Manage Condition'];
-const diets = ['No Preference', 'Keto', 'Vegan', 'Paleo', 'Mediterranean', 'High Protein', 'Low Carb', 'Vegetarian'];
+import { FiUser, FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
+import './Auth.css';
 
 export default function Register() {
   const { register } = useAuth();
-  const navigate = useNavigate();
-  const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    name: '', email: '', password: '', goals: [], diet: 'No Preference',
-  });
+  const navigate     = useNavigate();
 
-  const updateForm = (key, val) => setForm(prev => ({ ...prev, [key]: val }));
+  const [name, setName]         = useState('');
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm]   = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
 
-  const toggleGoal = (goal) => {
-    setForm(prev => ({
-      ...prev,
-      goals: prev.goals.includes(goal)
-        ? prev.goals.filter(g => g !== goal)
-        : [...prev.goals, goal],
-    }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (step < 3) { setStep(step + 1); return; }
+    setError('');
+
+    if (!name || !email || !password)  { setError('All fields are required.'); return; }
+    if (password.length < 6)           { setError('Password must be at least 6 characters.'); return; }
+    if (password !== confirm)          { setError('Passwords do not match.'); return; }
+
     setLoading(true);
-    setTimeout(() => {
-      register(form);
+    const result = await register(name, email, password);
+    setLoading(false);
+
+    if (result.success) {
       navigate('/dashboard');
-    }, 600);
+    } else {
+      setError(result.error);
+    }
   };
 
   return (
-    <div className="auth-card">
-      <h1>Create Account</h1>
-      <p className="auth-subtitle">Step {step} of 3 — {step === 1 ? 'Your details' : step === 2 ? 'Your goals' : 'Diet preference'}</p>
-
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '24px' }}>
-        {[1, 2, 3].map(s => (
-          <div key={s} style={{
-            flex: 1, height: '4px', borderRadius: '4px',
-            background: s <= step ? 'var(--primary)' : 'var(--surface)',
-            transition: 'background 0.3s ease',
-          }} />
-        ))}
-      </div>
-
-      <form className="auth-form" onSubmit={handleSubmit}>
-        {step === 1 && (
-          <>
-            <div className="input-group">
-              <label>Full Name</label>
-              <div className="input-with-icon">
-                <FiUser className="input-icon" />
-                <input
-                  type="text" placeholder="Enter your full name"
-                  value={form.name} onChange={e => updateForm('name', e.target.value)} required
-                />
-              </div>
-            </div>
-            <div className="input-group">
-              <label>Email</label>
-              <div className="input-with-icon">
-                <FiMail className="input-icon" />
-                <input
-                  type="email" placeholder="Enter your email"
-                  value={form.email} onChange={e => updateForm('email', e.target.value)} required
-                />
-              </div>
-            </div>
-            <div className="input-group">
-              <label>Password</label>
-              <div className="input-with-icon">
-                <FiLock className="input-icon" />
-                <input
-                  type="password" placeholder="Create a password"
-                  value={form.password} onChange={e => updateForm('password', e.target.value)} required
-                />
-              </div>
-            </div>
-          </>
-        )}
-
-        {step === 2 && (
-          <div>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginBottom: '16px' }}>
-              Select your nutrition goals (pick one or more):
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              {goals.map(g => (
-                <button
-                  key={g} type="button"
-                  className={`tag ${form.goals.includes(g) ? 'active' : ''}`}
-                  style={{ padding: '12px', justifyContent: 'center', textAlign: 'center' }}
-                  onClick={() => toggleGoal(g)}
-                >
-                  {g}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {step === 3 && (
-          <div>
-            <p style={{ fontSize: '0.875rem', color: 'var(--text-tertiary)', marginBottom: '16px' }}>
-              Choose your preferred diet style:
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              {diets.map(d => (
-                <button
-                  key={d} type="button"
-                  className={`tag ${form.diet === d ? 'active' : ''}`}
-                  style={{ padding: '12px', justifyContent: 'center', textAlign: 'center' }}
-                  onClick={() => updateForm('diet', d)}
-                >
-                  {d}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: '12px' }}>
-          {step > 1 && (
-            <button type="button" className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setStep(step - 1)}>
-              <FiArrowLeft /> Back
-            </button>
-          )}
-          <button type="submit" className="btn btn-primary btn-lg" style={{ flex: 1 }} disabled={loading}>
-            {step < 3 ? <>Next <FiArrowRight /></> : loading ? 'Creating...' : 'Create Account'}
-          </button>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="logo-icon"><span>N</span></div>
+          <span>NutriConnect</span>
         </div>
-      </form>
 
-      <p className="auth-footer">
-        Already have an account? <Link to="/login">Sign in</Link>
-      </p>
+        <h2>Create your account</h2>
+        <p className="auth-subtitle">Start your nutrition journey today</p>
+
+        {error && (
+          <div className="auth-error">
+            <FiAlertCircle /> {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label className="auth-field">
+            <span><FiUser /> Full Name</span>
+            <input
+              type="text"
+              placeholder="Alex Morgan"
+              value={name}
+              onChange={e => setName(e.target.value)}
+              autoFocus
+            />
+          </label>
+          <label className="auth-field">
+            <span><FiMail /> Email</span>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+            />
+          </label>
+          <label className="auth-field">
+            <span><FiLock /> Password</span>
+            <input
+              type="password"
+              placeholder="At least 6 characters"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </label>
+          <label className="auth-field">
+            <span><FiLock /> Confirm Password</span>
+            <input
+              type="password"
+              placeholder="Repeat your password"
+              value={confirm}
+              onChange={e => setConfirm(e.target.value)}
+            />
+          </label>
+          <button
+            type="submit"
+            className="btn btn-primary auth-submit"
+            disabled={loading}
+          >
+            {loading ? 'Creating account...' : 'Create Account'}
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
+      </div>
     </div>
   );
 }

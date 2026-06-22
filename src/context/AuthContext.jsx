@@ -1,63 +1,80 @@
-import { createContext, useContext, useState, useCallback } from 'react';
-
-// Hardcoded here to avoid Vite module caching issues during development.
-// When the backend is built, login() will be replaced with an API call
-// and this object goes away entirely.
-const devUser = {
-  id: 'u1',
-  name: 'Alex Morgan',
-  email: 'alex@nutriconnect.com',
-  avatar: null,
-  role: 'admin',
-  subscription: 'premium',
-  assignedNutritionist: { id: 'n1', userId: 'nu1', name: 'Dr. Emily Roberts' },
-  profile: {
-    bio: 'Fitness enthusiast on a journey to better health 💪',
-    goals: ['weight_loss', 'muscle_gain'],
-    dietPreferences: ['high_protein', 'low_carb'],
-    allergies: ['gluten'],
-    currentWeight: 78,
-    targetWeight: 72,
-    height: 178,
-    age: 28,
-  },
-  stats: {
-    followers: 156,
-    following: 89,
-    postsCount: 42,
-    streak: 14,
-    badges: ['early_adopter', '7_day_streak', 'first_post', 'recipe_master'],
-    points: 2480,
-    level: 12,
-  },
-  notifications: 5,
-  createdAt: '2025-11-15T08:00:00Z',
-};
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { authAPI, setToken, clearToken, getToken } from '../services/api';
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser]                   = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading]             = useState(true); // true while restoring session
 
-  const login = useCallback((email, password) => {
-    setUser(devUser);
-    setIsAuthenticated(true);
-    return true;
+  // ── On app load, try to restore session from in-memory token ─────────────
+  // If the token is still in memory (e.g. navigating between pages),
+  // fetch the current user so the session persists across React re-renders.
+  useEffect(() => {
+    const restore = async () => {
+      const token = getToken(); // reads from localStorage now
+      if (!token) { setLoading(false); return; }
+      try {
+        const { user } = await authAPI.me();
+        setUser(user);
+        setIsAuthenticated(true);
+      } catch {
+        // Token expired or invalid — clear it and go to login
+        clearToken();
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+    restore();
   }, []);
 
-  const register = useCallback((data) => {
-    setUser({ ...devUser, ...data });
-    setIsAuthenticated(true);
-    return true;
+  // ── Login ─────────────────────────────────────────────────────────────────
+  // Returns { success: true } or { success: false, error: 'message' }
+  // so the Login page can show the right error without crashing.
+  const login = useCallback(async (email, password) => {
+    try {
+      const { token, user } = await authAPI.login(email, password);
+      setToken(token);
+      setUser(user);
+      setIsAuthenticated(true);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
   }, []);
 
+  // ── Register ──────────────────────────────────────────────────────────────
+  const register = useCallback(async (name, email, password) => {
+    try {
+      const { token, user } = await authAPI.register(name, email, password);
+      setToken(token);
+      setUser(user);
+      setIsAuthenticated(true);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message };
+    }
+  }, []);
+
+  // ── Logout ────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
+    clearToken();
     setUser(null);
     setIsAuthenticated(false);
   }, []);
 
-  const value = { user, isAuthenticated, login, register, logout };
+  // ── Update local user state (e.g. after profile edit) ────────────────────
+  const updateUser = useCallback((updates) => {
+    setUser(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const value = { user, isAuthenticated, loading, login, register, logout, updateUser };
+
+  // Don't render children until we've tried to restore the session.
+  // This prevents a flash of the login page on refresh.
+  if (loading) return null;
 
   return (
     <AuthContext.Provider value={value}>

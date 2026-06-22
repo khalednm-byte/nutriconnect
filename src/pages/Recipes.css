@@ -2,7 +2,7 @@
 .recipes-page { max-width: 1100px; display: flex; gap: var(--space-xl); align-items: flex-start; }
 .recipes-main { flex: 1; min-width: 0; transition: all 0.3s ease; }
 
-.recipes-header { margin-bottom: var(--space-2xl); }
+.recipes-header { margin-bottom: var(--space-2xl); display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-md); }
 .recipes-header h2 { margin-bottom: var(--space-xs); }
 .recipes-header p { color: var(--text-tertiary); font-size: var(--font-sm); }
 

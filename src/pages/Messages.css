@@ -32,7 +32,7 @@
 }
 
 /* Chat */
-.msg-chat { display: flex; flex-direction: column; }
+.msg-chat { display: flex; flex-direction: column; min-height: 0; }
 .msg-chat-header {
   display: flex; align-items: center; gap: var(--space-md);
   padding: var(--space-lg) var(--space-xl);
@@ -77,3 +77,95 @@
   .msg-layout { grid-template-columns: 1fr; }
   .msg-list { max-height: 200px; border-right: none; border-bottom: 1px solid var(--border); }
 }
+
+/* ── Emoji picker ── */
+.emoji-picker {
+  position: absolute;
+  bottom: calc(var(--space-xl) + 56px);
+  right: var(--space-lg);
+  width: 320px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  z-index: 100;
+  overflow: hidden;
+  animation: emoji-pop 0.15s ease;
+}
+@keyframes emoji-pop {
+  from { opacity: 0; transform: scale(0.95) translateY(8px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.emoji-categories {
+  display: flex;
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.emoji-cat-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 18px; padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast);
+  line-height: 1;
+}
+.emoji-cat-btn:hover  { background: var(--bg-tertiary); }
+.emoji-cat-btn.active { background: var(--primary); }
+
+.emoji-cat-label {
+  font-size: var(--font-xs);
+  color: var(--text-muted);
+  padding: var(--space-xs) var(--space-md);
+  font-weight: var(--weight-medium);
+}
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 2px;
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+  max-height: 200px;
+  overflow-y: auto;
+}
+.emoji-btn {
+  background: none; border: none; cursor: pointer;
+  font-size: 20px; padding: 4px;
+  border-radius: var(--radius-sm);
+  line-height: 1; text-align: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+.emoji-btn:hover {
+  background: var(--surface);
+  transform: scale(1.2);
+}
+
+/* Active state for emoji toggle button */
+.msg-input-btn.active { color: var(--primary); }
+
+/* ── Attachment preview ── */
+.msg-attachment-preview {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-xl);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  font-size: var(--font-xs); color: var(--text-secondary);
+}
+.msg-attachment-size { color: var(--text-muted); margin-left: auto; }
+.msg-attachment-remove {
+  background: none; border: none; cursor: pointer;
+  color: var(--text-muted); display: flex; align-items: center;
+  padding: 2px; border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+.msg-attachment-remove:hover { color: var(--danger, #e8735a); }
+
+/* File message bubble */
+.msg-bubble-file { font-style: italic; }
+
+/* Make input area position:relative so emoji picker can anchor to it */
+.msg-chat-input { position: relative; }
+
+.msg-no-results { padding: var(--space-xl); text-align: center; color: var(--text-muted); font-size: var(--font-sm); }
+.msg-input-btn.active { color: var(--primary); }

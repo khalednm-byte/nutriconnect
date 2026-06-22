@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import { Component } from 'react';
 
 // Layouts
 import PublicLayout from './layouts/PublicLayout';
@@ -25,6 +26,33 @@ import Progress from './pages/Progress';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import AdminDashboard from './pages/AdminDashboard';
+import NutritionistApplication from './pages/NutritionistApplication';
+
+// Error boundary — catches render crashes and shows the error
+// instead of a blank screen. Remove in production or replace with
+// a proper error UI.
+class ErrorBoundary extends Component {
+  state = { error: null };
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: '2rem', color: '#e8735a', fontFamily: 'monospace' }}>
+          <h2>Page crashed</h2>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: '13px' }}>
+            {this.state.error.message}
+            {'\n\n'}
+            {this.state.error.stack}
+          </pre>
+          <button onClick={() => this.setState({ error: null })} style={{ marginTop: '1rem' }}>
+            Try again
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = useAuth();
@@ -47,19 +75,20 @@ function App() {
 
       {/* Dashboard Routes (Protected) */}
       <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/community" element={<Community />} />
-        <Route path="/meal-planner" element={<MealPlanner />} />
-        <Route path="/recipes" element={<Recipes />} />
-        <Route path="/nutritionists" element={<Nutritionists />} />
-        <Route path="/nutritionists/:id" element={<NutritionistProfile />} />
-        <Route path="/messages" element={<Messages />} />
-        <Route path="/challenges" element={<Challenges />} />
-        <Route path="/progress" element={<Progress />} />
-        <Route path="/blog" element={<Blog />} />
-        <Route path="/blog/:slug" element={<BlogPost />} />
-        <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/dashboard"          element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
+        <Route path="/profile"            element={<ErrorBoundary><Profile /></ErrorBoundary>} />
+        <Route path="/community"          element={<ErrorBoundary><Community /></ErrorBoundary>} />
+        <Route path="/meal-planner"       element={<ErrorBoundary><MealPlanner /></ErrorBoundary>} />
+        <Route path="/recipes"            element={<ErrorBoundary><Recipes /></ErrorBoundary>} />
+        <Route path="/nutritionists"      element={<ErrorBoundary><Nutritionists /></ErrorBoundary>} />
+        <Route path="/nutritionists/:id"  element={<ErrorBoundary><NutritionistProfile /></ErrorBoundary>} />
+        <Route path="/messages"           element={<ErrorBoundary><Messages /></ErrorBoundary>} />
+        <Route path="/challenges"         element={<ErrorBoundary><Challenges /></ErrorBoundary>} />
+        <Route path="/progress"           element={<ErrorBoundary><Progress /></ErrorBoundary>} />
+        <Route path="/blog"               element={<ErrorBoundary><Blog /></ErrorBoundary>} />
+        <Route path="/blog/:slug"         element={<ErrorBoundary><BlogPost /></ErrorBoundary>} />
+        <Route path="/admin"              element={<ErrorBoundary><AdminDashboard /></ErrorBoundary>} />
+        <Route path="/apply-nutritionist" element={<ErrorBoundary><NutritionistApplication /></ErrorBoundary>} />
       </Route>
 
       {/* Fallback */}

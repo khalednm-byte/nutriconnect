@@ -1,89 +1,88 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiMail, FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiMail, FiLock, FiAlertCircle } from 'react-icons/fi';
+import './Auth.css';
 
 export default function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  const [email, setEmail] = useState('alex@nutriconnect.com');
-  const [password, setPassword] = useState('password');
-  const [showPass, setShowPass] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const { login }   = useAuth();
+  const navigate    = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError]       = useState('');
+  const [loading, setLoading]   = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    if (!email || !password) {
+      setError('Please enter your email and password.');
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      login(email, password);
+    const result = await login(email, password);
+    setLoading(false);
+
+    if (result.success) {
       navigate('/dashboard');
-    }, 600);
+    } else {
+      setError(result.error);
+    }
   };
 
   return (
-    <div className="auth-card">
-      <h1>Welcome Back</h1>
-      <p className="auth-subtitle">Sign in to continue your nutrition journey</p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-logo">
+          <div className="logo-icon"><span>N</span></div>
+          <span>NutriConnect</span>
+        </div>
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="input-group">
-          <label>Email</label>
-          <div className="input-with-icon">
-            <FiMail className="input-icon" />
+        <h2>Welcome back</h2>
+        <p className="auth-subtitle">Sign in to your account</p>
+
+        {error && (
+          <div className="auth-error">
+            <FiAlertCircle /> {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label className="auth-field">
+            <span><FiMail /> Email</span>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
+              onChange={e => setEmail(e.target.value)}
+              autoFocus
             />
-          </div>
-        </div>
-
-        <div className="input-group">
-          <label>Password</label>
-          <div className="input-with-icon">
-            <FiLock className="input-icon" />
-            <input
-              type={showPass ? 'text' : 'password'}
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <button
-              type="button"
-              className="input-icon"
-              style={{ right: '14px', left: 'auto', cursor: 'pointer', background: 'none', border: 'none', color: 'var(--text-muted)', position: 'absolute' }}
-              onClick={() => setShowPass(!showPass)}
-            >
-              {showPass ? <FiEyeOff /> : <FiEye />}
-            </button>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.875rem', color: 'var(--text-tertiary)', cursor: 'pointer' }}>
-            <input type="checkbox" defaultChecked /> Remember me
           </label>
-          <a href="#" style={{ fontSize: '0.875rem', color: 'var(--primary-light)' }}>Forgot password?</a>
-        </div>
+          <label className="auth-field">
+            <span><FiLock /> Password</span>
+            <input
+              type="password"
+              placeholder="Your password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+            />
+          </label>
+          <button
+            type="submit"
+            className="btn btn-primary auth-submit"
+            disabled={loading}
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
 
-        <button type="submit" className="btn btn-primary btn-lg" disabled={loading}>
-          {loading ? 'Signing in...' : 'Sign In'}
-        </button>
-      </form>
-
-      <div className="divider-text" style={{ margin: '24px 0 16px' }}>or continue with</div>
-
-      <div className="auth-social-buttons">
-        <button className="auth-social-btn">🇬 Google</button>
-        <button className="auth-social-btn">🍎 Apple</button>
+        <p className="auth-switch">
+          Don't have an account? <Link to="/register">Create one</Link>
+        </p>
       </div>
-
-      <p className="auth-footer">
-        Don't have an account? <Link to="/register">Sign up free</Link>
-      </p>
     </div>
   );
 }
