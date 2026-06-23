@@ -132,7 +132,7 @@ router.get('/my-patients', auth, async (req, res) => {
 
     // Patients are users whose assignedNutritionist.id matches this nutritionist
     const patients = await User.find({
-      role: 'user',
+      role: { $in: ['patient', 'user'] },
       $or: [
         { 'assignedNutritionist.id': req.user.id },
         { 'assignedNutritionist': req.user.id },

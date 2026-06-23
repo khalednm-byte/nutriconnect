@@ -115,6 +115,32 @@
   padding-top: var(--space-sm); border-top: 1px solid var(--border);
 }
 
+.ticket-actions {
+  display: flex; gap: var(--space-sm); margin-top: var(--space-md);
+}
+
+/* ── Patient selector (nutritionist) ── */
+.planner-patients h3 { margin-bottom: var(--space-md); }
+.patient-list { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
+.patient-chip {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-full); cursor: pointer;
+  font-size: var(--font-sm); color: var(--text-secondary);
+  transition: all var(--transition-fast);
+}
+.patient-chip:hover { border-color: var(--primary); }
+.patient-chip.active {
+  background: var(--primary-subtle, rgba(78,191,143,0.15));
+  border-color: var(--primary); color: var(--text-primary);
+}
+
+.macros-note, .macros-estimated-note {
+  font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-md);
+}
+.macros-estimated-note { margin-top: var(--space-md); margin-bottom: 0; }
+
 /* ── Modal ── */
 .modal-overlay {
   position: fixed; inset: 0;

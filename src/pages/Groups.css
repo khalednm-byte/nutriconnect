@@ -1,0 +1,88 @@
+.groups-page { max-width: 1000px; }
+
+.groups-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: var(--space-2xl); flex-wrap: wrap; gap: var(--space-lg);
+}
+.groups-header h2 { margin-bottom: var(--space-xs); }
+.groups-header p { color: var(--text-tertiary); font-size: var(--font-sm); }
+
+.groups-empty, .groups-join {
+  text-align: center; padding: var(--space-3xl) var(--space-2xl);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-md);
+  color: var(--text-muted);
+}
+.groups-empty h3, .groups-join h3 { color: var(--text-primary); margin: 0; }
+.groups-empty p, .groups-join p { max-width: 400px; margin: 0; }
+
+.groups-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: var(--space-lg); }
+
+.group-card { display: flex; flex-direction: column; gap: var(--space-md); }
+.group-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-md); }
+.group-card-header h3 { margin: 0; font-size: var(--font-lg); }
+
+.invite-code-btn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 4px 10px; background: var(--surface);
+  border: 1px dashed var(--primary); border-radius: var(--radius-md);
+  font-size: var(--font-xs); font-weight: var(--weight-semibold);
+  color: var(--primary); cursor: pointer; white-space: nowrap;
+  font-family: monospace; letter-spacing: 1px;
+  transition: background var(--transition-fast);
+}
+.invite-code-btn:hover { background: var(--primary-subtle, rgba(78,191,143,0.1)); }
+
+.group-description { font-size: var(--font-sm); color: var(--text-muted); margin: 0; }
+.group-members-label { font-size: var(--font-xs); color: var(--text-muted); display: block; margin-bottom: var(--space-sm); }
+.group-member-avatars { display: flex; align-items: center; gap: 4px; }
+.group-more { font-size: var(--font-xs); color: var(--text-muted); margin-left: 4px; }
+.group-challenges { font-size: var(--font-xs); color: var(--text-secondary); display: flex; align-items: center; gap: 4px; }
+
+.groups-layout { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-xl); }
+@media (max-width: 768px) { .groups-layout { grid-template-columns: 1fr; } }
+
+.group-member-list { display: flex; flex-direction: column; gap: var(--space-sm); margin-top: var(--space-sm); }
+.group-member-row {
+  display: flex; align-items: center; gap: var(--space-sm);
+  font-size: var(--font-sm);
+}
+.member-points { margin-left: auto; color: var(--primary); font-weight: var(--weight-semibold); font-size: var(--font-xs); }
+
+.group-leaderboard h3 { display: flex; align-items: center; gap: var(--space-sm); margin-bottom: var(--space-lg); }
+.lb-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.lb-row {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md); font-size: var(--font-sm);
+}
+.lb-row.lb-you { background: var(--primary-subtle, rgba(78,191,143,0.1)); }
+.lb-rank { font-weight: var(--weight-bold); color: var(--text-muted); min-width: 28px; }
+.lb-name { flex: 1; }
+.lb-stat { font-size: var(--font-xs); color: var(--text-muted); }
+.lb-points { font-weight: var(--weight-semibold); color: var(--primary); font-size: var(--font-xs); }
+
+.join-form { display: flex; gap: var(--space-sm); margin-top: var(--space-md); width: 100%; max-width: 400px; }
+.join-form input { flex: 1; font-family: monospace; letter-spacing: 2px; text-transform: uppercase; }
+
+.groups-field { display: flex; flex-direction: column; gap: var(--space-xs); }
+.groups-field span { font-size: var(--font-xs); color: var(--text-secondary); font-weight: var(--weight-medium); }
+.groups-field input, .groups-field textarea { width: 100%; }
+
+.patient-checklist { display: flex; flex-direction: column; gap: var(--space-xs); max-height: 200px; overflow-y: auto; }
+.patient-check-item {
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-sm); border-radius: var(--radius-md);
+  cursor: pointer; font-size: var(--font-sm);
+  transition: background var(--transition-fast);
+}
+.patient-check-item:hover { background: var(--surface); }
+
+.groups-toast {
+  position: fixed; bottom: var(--space-xl); right: var(--space-xl);
+  display: flex; align-items: center; gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--primary); color: #fff;
+  border-radius: var(--radius-lg); font-size: var(--font-sm);
+  z-index: 1000; box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+.groups-toast-error { background: var(--danger, #e8735a); }

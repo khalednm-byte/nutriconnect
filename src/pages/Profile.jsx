@@ -242,7 +242,7 @@ export default function Profile() {
                 <button className="btn btn-secondary btn-sm" onClick={() => setEditing(true)}>
                   <FiEdit2 /> Edit Profile
                 </button>
-                {user?.role === 'user' && (
+                {(user?.role === 'patient' || user?.role === 'user') && (
                   <button className="btn btn-primary btn-sm" onClick={() => navigate('/apply-nutritionist')}>
                     <FiStar /> Apply as Nutritionist
                   </button>

@@ -4,6 +4,24 @@ const auth     = require('../middleware/auth');
 
 const router = express.Router();
 
+// ── GET /api/messages/unread-count ───────────────────────────────────────────
+router.get('/unread-count', auth, async (req, res) => {
+  try {
+    const conversations = await Conversation.find({ participants: req.user.id }).select('_id');
+    const convIds = conversations.map(c => c._id);
+    if (convIds.length === 0) return res.json({ count: 0 });
+
+    const count = await Message.countDocuments({
+      conversationId: { $in: convIds },
+      senderId: { $ne: req.user.id },
+      read: false,
+    });
+    res.json({ count });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ── GET /api/messages/conversations ──────────────────────────────────────────
 // Returns all conversations for the logged-in user
 router.get('/conversations', auth, async (req, res) => {

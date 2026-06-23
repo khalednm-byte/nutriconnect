@@ -4,6 +4,36 @@ const auth    = require('../middleware/auth');
 
 const router = express.Router();
 
+// ── GET /api/users/search ─────────────────────────────────────────────────────
+router.get('/search', auth, async (req, res) => {
+  try {
+    const q = (req.query.q || '').trim();
+    if (!q || q.length < 2)
+      return res.json({ patients: [], nutritionists: [] });
+
+    const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+
+    const [patients, nutritionists] = await Promise.all([
+      User.find({
+        role: { $in: ['patient', 'user'] },
+        $or: [{ name: regex }, { email: regex }],
+      })
+        .select('name email role profile.avatar stats.points')
+        .limit(8),
+      User.find({
+        role: 'nutritionist',
+        $or: [{ name: regex }, { email: regex }, { 'nutritionistProfile.specializations': regex }],
+      })
+        .select('name email role profile.avatar nutritionistProfile')
+        .limit(8),
+    ]);
+
+    res.json({ patients, nutritionists });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ── GET /api/users/nutritionists ──────────────────────────────────────────────
 // Public — must be before /:id or Express will try to find a user with id "nutritionists"
 router.get('/nutritionists', async (req, res) => {

@@ -48,12 +48,17 @@ export const authAPI = {
     api.post('/auth/register', { name, email, password }),
   login: (email, password) =>
     api.post('/auth/login', { email, password }),
+  forgotPassword: (email) =>
+    api.post('/auth/forgot-password', { email }),
+  resetPassword: (token, password) =>
+    api.post('/auth/reset-password', { token, password }),
   me: () =>
     api.get('/auth/me'),
 };
 
 // ── Users ─────────────────────────────────────────────────────────────────────
 export const usersAPI = {
+  search:          (q)      => api.get(`/users/search?q=${encodeURIComponent(q)}`),
   getProfile:      (id)     => api.get(`/users/${id}`),
   updateProfile:   (data)   => api.put('/users/profile', data),
   getNutritionists:()       => api.get('/users/nutritionists'),
@@ -85,6 +90,7 @@ export const postsAPI = {
 
 // ── Messages ──────────────────────────────────────────────────────────────────
 export const messagesAPI = {
+  getUnreadCount:    ()              => api.get('/messages/unread-count'),
   getConversations:  ()              => api.get('/messages/conversations'),
   getMessages:       (convId)        => api.get(`/messages/conversations/${convId}`),
   startConversation: (participantId) => api.post('/messages/conversations', { participantId }),
@@ -102,6 +108,7 @@ export const setupAPI = {
 export const groupsAPI = {
   getMine:        ()             => api.get('/groups'),       // nutritionist's own groups
   getMyGroup:     ()             => api.get('/groups/my-group'), // patient's group
+  join:           (inviteCode)   => api.post('/groups/join', { inviteCode }),
   getLeaderboard: (id)           => api.get(`/groups/${id}/leaderboard`),
   create:         (data)         => api.post('/groups', data),
   update:         (id, data)     => api.put(`/groups/${id}`, data),
@@ -142,8 +149,11 @@ export const progressAPI = {
 export const mealPlanAPI = {
   get:              ()           => api.get('/mealplan'),
   save:             (plan)       => api.put('/mealplan', { plan }),
+  getPatientPlan:   (patientId)  => api.get(`/mealplan/patient/${patientId}`),
+  savePatientPlan:  (patientId, plan) => api.put(`/mealplan/patient/${patientId}`, { plan }),
   submitSwapRequest:(data)       => api.post('/mealplan/swap-requests', data),
   getSwapRequests:  ()           => api.get('/mealplan/swap-requests'),
+  getIncomingSwapRequests: ()    => api.get('/mealplan/swap-requests/incoming'),
   reviewSwapRequest:(id, status, reviewNotes) =>
     api.put(`/mealplan/swap-requests/${id}`, { status, reviewNotes }),
 };

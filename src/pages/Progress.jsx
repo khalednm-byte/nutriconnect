@@ -336,7 +336,7 @@ export default function Progress() {
       {/* Log Weight Modal */}
       {showLogModal && (
         <div className="modal-overlay" onClick={() => setShowLogModal(false)}>
-          <div className="modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
+          <div className="modal form-modal" style={{ maxWidth: 420 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <div>
                 <h3>{todayHasEntry ? 'Edit Today\'s Entry' : 'Log Today\'s Entry'}</h3>

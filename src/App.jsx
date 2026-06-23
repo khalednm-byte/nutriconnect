@@ -11,6 +11,8 @@ import AuthLayout from './layouts/AuthLayout';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Dashboard Pages
 import Dashboard from './pages/Dashboard';
@@ -25,6 +27,7 @@ import Challenges from './pages/Challenges';
 import Progress from './pages/Progress';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import Groups from './pages/Groups';
 import AdminDashboard from './pages/AdminDashboard';
 import NutritionistApplication from './pages/NutritionistApplication';
 
@@ -71,6 +74,8 @@ function App() {
       <Route element={<AuthLayout />}>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
       </Route>
 
       {/* Dashboard Routes (Protected) */}
@@ -78,6 +83,7 @@ function App() {
         <Route path="/dashboard"          element={<ErrorBoundary><Dashboard /></ErrorBoundary>} />
         <Route path="/profile"            element={<ErrorBoundary><Profile /></ErrorBoundary>} />
         <Route path="/community"          element={<ErrorBoundary><Community /></ErrorBoundary>} />
+        <Route path="/groups"             element={<ErrorBoundary><Groups /></ErrorBoundary>} />
         <Route path="/meal-planner"       element={<ErrorBoundary><MealPlanner /></ErrorBoundary>} />
         <Route path="/recipes"            element={<ErrorBoundary><Recipes /></ErrorBoundary>} />
         <Route path="/nutritionists"      element={<ErrorBoundary><Nutritionists /></ErrorBoundary>} />

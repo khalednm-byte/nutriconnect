@@ -7,6 +7,10 @@ const auth         = require('../middleware/auth');
 
 const router = express.Router();
 
+function generateInviteCode() {
+  return Math.random().toString(36).substring(2, 8).toUpperCase();
+}
+
 // Helper — only nutritionists can manage groups
 function requireNutritionist(req, res, next) {
   if (req.user.role !== 'nutritionist') {
@@ -20,7 +24,7 @@ async function validateOwnPatients(nutritionistId, patientIds) {
   if (!patientIds || patientIds.length === 0) return true;
   const patients = await User.find({
     _id: { $in: patientIds },
-    role: 'user',
+    role: { $in: ['patient', 'user'] },
     $or: [
       { 'assignedNutritionist.id': nutritionistId },
       { 'assignedNutritionist': nutritionistId },
@@ -46,6 +50,43 @@ router.get('/my-group', auth, async (req, res) => {
   }
 });
 
+// ── POST /api/groups/join ─────────────────────────────────────────────────────
+// User joins a group via invite code from their nutritionist
+router.post('/join', auth, async (req, res) => {
+  try {
+    if (req.user.role !== 'patient' && req.user.role !== 'user')
+      return res.status(403).json({ message: 'Only patients can join groups' });
+
+    const { inviteCode } = req.body;
+    if (!inviteCode) return res.status(400).json({ message: 'inviteCode is required' });
+
+    const group = await Group.findOne({ inviteCode: inviteCode.toUpperCase().trim() });
+    if (!group) return res.status(404).json({ message: 'Invalid invite code' });
+
+    const isPatient = await validateOwnPatients(group.nutritionistId.toString(), [req.user.id]);
+    if (!isPatient)
+      return res.status(403).json({ message: 'You can only join groups created by your assigned nutritionist' });
+
+    const user = await User.findById(req.user.id);
+    if (user.groupId && user.groupId.toString() !== group._id.toString()) {
+      await Group.findByIdAndUpdate(user.groupId, { $pull: { members: req.user.id } });
+    }
+
+    if (!group.members.some(m => m.toString() === req.user.id)) {
+      group.members.push(req.user.id);
+      await group.save();
+    }
+    await User.findByIdAndUpdate(req.user.id, { $set: { groupId: group._id } });
+
+    const updated = await Group.findById(group._id)
+      .populate('members', 'name profile.avatar stats.points')
+      .populate('challengeIds');
+    res.json({ group: updated });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 // ── GET /api/groups ────────────────────────────────────────────────────────────
 // For nutritionists — list groups they manage
 router.get('/', auth, requireNutritionist, async (req, res) => {
@@ -54,6 +95,14 @@ router.get('/', auth, requireNutritionist, async (req, res) => {
       .populate('members', 'name profile.avatar stats.points')
       .populate('challengeIds')
       .sort({ createdAt: -1 });
+
+    for (const group of groups) {
+      if (!group.inviteCode) {
+        group.inviteCode = generateInviteCode();
+        await group.save();
+      }
+    }
+
     res.json({ groups });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -80,6 +129,7 @@ router.post('/', auth, requireNutritionist, async (req, res) => {
       name,
       description: description || '',
       members: memberIds || [],
+      inviteCode: generateInviteCode(),
     });
 
     // Update each member's groupId (single group per user)

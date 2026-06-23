@@ -70,6 +70,9 @@ export default function Login() {
               onChange={e => setPassword(e.target.value)}
             />
           </label>
+          <div className="auth-forgot">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </div>
           <button
             type="submit"
             className="btn btn-primary auth-submit"

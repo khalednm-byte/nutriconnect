@@ -413,7 +413,7 @@ export default function Challenges() {
         <div className="card leaderboard-card">
           <h3 style={{ marginBottom: 'var(--space-xl)' }}>🏆 Community Leaderboard</h3>
           <p style={{ fontSize: 'var(--font-xs)', color: 'var(--text-muted)', marginBottom: 'var(--space-lg)' }}>
-            Platform-wide ranking. For your group's leaderboard, visit the Groups page.
+            Platform-wide ranking. For your group's leaderboard, visit the <a href="/groups" style={{ color: 'var(--primary)' }}>Groups page</a>.
           </p>
           <div className="leaderboard-list">
             {mockLeaderboard.map((entry, i) => (
@@ -441,7 +441,7 @@ export default function Challenges() {
       {/* ── Create Challenge Modal ── */}
       {showCreate && canCreate && (
         <div className="modal-overlay" onClick={() => setShowCreate(false)}>
-          <div className="modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
+          <div className="modal form-modal" style={{ maxWidth: 520 }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Create New Challenge</h3>
               <button className="modal-close" onClick={() => setShowCreate(false)}><FiX /></button>

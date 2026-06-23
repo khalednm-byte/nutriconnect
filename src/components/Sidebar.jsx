@@ -1,6 +1,8 @@
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getInitials, getAvatarColor } from '../data/users';
+import { messagesAPI } from '../services/api';
 import {
   FiHome, FiUsers, FiMessageSquare, FiCalendar, FiBook,
   FiAward, FiTrendingUp, FiLogOut, FiUser, FiGrid,
@@ -8,13 +10,14 @@ import {
 } from 'react-icons/fi';
 import './Sidebar.css';
 
-const navItems = [
+const baseNavItems = [
   { path: '/dashboard',    icon: FiHome,          label: 'Dashboard' },
   { path: '/community',    icon: FiUsers,          label: 'Community' },
   { path: '/meal-planner', icon: FiCalendar,       label: 'Meal Planner' },
   { path: '/recipes',      icon: FiBook,           label: 'Recipes' },
   { path: '/nutritionists',icon: FiGrid,           label: 'Nutritionists' },
-  { path: '/messages',     icon: FiMessageSquare,  label: 'Messages', badge: 3 },
+  { path: '/groups',       icon: FiUsers,          label: 'Groups' },
+  { path: '/messages',     icon: FiMessageSquare,  label: 'Messages', badgeKey: 'messages' },
   { path: '/progress',     icon: FiTrendingUp,     label: 'Progress' },
   { path: '/challenges',   icon: FiAward,          label: 'Challenges' },
   { path: '/blog',         icon: FiBookOpen,       label: 'Blog' },
@@ -25,6 +28,19 @@ export default function Sidebar() {
   const navigate  = useNavigate();
   const { user, logout } = useAuth();
   const isAdmin = user?.role === 'admin';
+  const [unreadMessages, setUnreadMessages] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    messagesAPI.getUnreadCount()
+      .then(({ count }) => setUnreadMessages(count || 0))
+      .catch(() => setUnreadMessages(0));
+  }, [user, location.pathname]);
+
+  const navItems = baseNavItems.filter(item => {
+    if (item.path === '/nutritionists' && user?.role === 'nutritionist') return false;
+    return true;
+  });
 
   const handleLogout = () => { logout(); navigate('/'); };
 
@@ -49,7 +65,9 @@ export default function Sidebar() {
             >
               <item.icon className="nav-icon" />
               <span className="nav-label">{item.label}</span>
-              {item.badge && <span className="nav-badge">{item.badge}</span>}
+              {item.badgeKey === 'messages' && unreadMessages > 0 && (
+                <span className="nav-badge">{unreadMessages}</span>
+              )}
             </Link>
           ))}
         </div>

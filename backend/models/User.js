@@ -5,7 +5,9 @@ const userSchema = new mongoose.Schema({
   name:     { type: String, required: true, trim: true },
   email:    { type: String, required: true, unique: true, lowercase: true, trim: true },
   password: { type: String, required: true, minlength: 6, select: false },
-  role:     { type: String, enum: ['user', 'nutritionist', 'admin'], default: 'user' },
+  resetPasswordToken:   { type: String, select: false },
+  resetPasswordExpires: Date,
+  role:     { type: String, enum: ['patient', 'nutritionist', 'admin'], default: 'patient' },
   subscription: { type: String, enum: ['free', 'premium', 'pro'], default: 'free' },
 
   assignedNutritionist: {

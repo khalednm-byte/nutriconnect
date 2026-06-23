@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getInitials, getAvatarColor } from '../data/users';
 import { groups, trendingTags } from '../data/posts'; // sidebar data stays static for now
 import { postsAPI } from '../services/api';
-import { FiHeart, FiMessageCircle, FiShare2, FiBookmark, FiSend, FiTrash2, FiLoader } from 'react-icons/fi';
+import { FiHeart, FiMessageCircle, FiShare2, FiBookmark, FiSend, FiTrash2, FiImage, FiX } from 'react-icons/fi';
 import './Community.css';
 
 const filters   = ['All', 'Meals', 'Tips', 'Recipes', 'Transformations'];
@@ -20,9 +20,11 @@ export default function Community() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [newPostText, setNewPostText] = useState('');
   const [newPostType, setNewPostType] = useState('meal');
+  const [newPostImages, setNewPostImages] = useState([]);
   const [posting, setPosting]         = useState(false);
   const [openComments, setOpenComments]   = useState({});
   const [commentInputs, setCommentInputs] = useState({});
+  const imageInputRef = useRef(null);
 
   // ── Fetch posts on mount and when filter changes ──
   useEffect(() => {
@@ -43,16 +45,51 @@ export default function Community() {
   }, [activeFilter]);
 
   // ── Submit new post ──
+  const handleImageSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    const remaining = 4 - newPostImages.length;
+    const toAdd = files.slice(0, remaining);
+
+    toAdd.forEach(file => {
+      if (!file.type.startsWith('image/')) return;
+      if (file.size > 1_000_000) {
+        setError('Each image must be under 1 MB.');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = () => {
+        setNewPostImages(prev => {
+          if (prev.length >= 4) return prev;
+          return [...prev, reader.result];
+        });
+      };
+      reader.readAsDataURL(file);
+    });
+    e.target.value = '';
+  };
+
+  const removeNewImage = (index) => {
+    setNewPostImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmitPost = async () => {
     if (!newPostText.trim()) return;
     setPosting(true);
     try {
-      const { post } = await postsAPI.create({ type: newPostType, content: newPostText, tags: [], images: [] });
+      const { post } = await postsAPI.create({
+        type: newPostType,
+        content: newPostText,
+        tags: [],
+        images: newPostImages,
+      });
       setFeedPosts(prev => [{ ...post, liked: false, likesCount: 0 }, ...prev]);
       setNewPostText('');
       setNewPostType('meal');
+      setNewPostImages([]);
     } catch (err) {
-      setError('Failed to create post.');
+      setError(err.message || 'Failed to create post.');
     } finally {
       setPosting(false);
     }
@@ -148,6 +185,18 @@ export default function Community() {
                 rows={2}
               />
             </div>
+            {newPostImages.length > 0 && (
+              <div className="post-image-previews">
+                {newPostImages.map((img, i) => (
+                  <div key={i} className="post-image-preview">
+                    <img src={img} alt={`Preview ${i + 1}`} />
+                    <button className="post-image-remove" onClick={() => removeNewImage(i)} title="Remove image">
+                      <FiX />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="create-post-actions">
               <div className="post-type-selector">
                 {postTypes.map(type => (
@@ -158,6 +207,22 @@ export default function Community() {
                     {typeEmoji[type]} {type.charAt(0).toUpperCase() + type.slice(1)}
                   </button>
                 ))}
+                <button
+                  className="btn btn-sm btn-ghost"
+                  onClick={() => imageInputRef.current?.click()}
+                  disabled={newPostImages.length >= 4}
+                  title="Add photo"
+                >
+                  <FiImage /> Photo
+                </button>
+                <input
+                  ref={imageInputRef}
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  hidden
+                  onChange={handleImageSelect}
+                />
               </div>
               <button className="btn btn-primary btn-sm"
                 disabled={!newPostText.trim() || posting}
@@ -223,6 +288,14 @@ export default function Community() {
               <div className="post-content">
                 <p style={{ whiteSpace: 'pre-line' }}>{post.content}</p>
               </div>
+
+              {post.images?.length > 0 && (
+                <div className={`post-images post-images-${Math.min(post.images.length, 4)}`}>
+                  {post.images.map((img, i) => (
+                    <img key={i} src={img} alt={`Post image ${i + 1}`} className="post-image" />
+                  ))}
+                </div>
+              )}
 
               {post.tags?.length > 0 && (
                 <div className="post-tags">

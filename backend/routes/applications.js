@@ -9,7 +9,7 @@ const router = express.Router();
 // Any regular user can submit an application
 router.post('/', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'user')
+    if (req.user.role !== 'patient' && req.user.role !== 'user')
       return res.status(403).json({ message: 'Only regular users can apply' });
 
     // Prevent duplicate pending applications

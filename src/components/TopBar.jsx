@@ -1,11 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getInitials, getAvatarColor } from '../data/users';
-import { FiSearch, FiBell, FiMessageSquare, FiCheckCircle, FiAward, FiStar } from 'react-icons/fi';
+import { usersAPI } from '../services/api';
+import { FiSearch, FiBell, FiMessageSquare, FiCheckCircle, FiAward, FiStar, FiUser, FiX } from 'react-icons/fi';
 import './TopBar.css';
 
-// Maps notification type → icon
 const notifIcon = {
   message:   <FiMessageSquare style={{ color: 'var(--primary)' }} />,
   swap:      <FiCheckCircle   style={{ color: 'var(--secondary)' }} />,
@@ -24,18 +24,53 @@ export default function TopBar({ title }) {
   );
   const notifRef = useRef(null);
 
+  const [searchQuery, setSearchQuery]     = useState('');
+  const [searchResults, setSearchResults] = useState({ patients: [], nutritionists: [] });
+  const [searchOpen, setSearchOpen]       = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchRef = useRef(null);
+  const searchTimer = useRef(null);
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  // Close panel when clicking outside
+  const runSearch = useCallback(async (q) => {
+    if (!q || q.length < 2) {
+      setSearchResults({ patients: [], nutritionists: [] });
+      return;
+    }
+    setSearchLoading(true);
+    try {
+      const results = await usersAPI.search(q);
+      setSearchResults(results);
+    } catch {
+      setSearchResults({ patients: [], nutritionists: [] });
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const handler = (e) => {
       if (notifRef.current && !notifRef.current.contains(e.target)) {
         setShowNotifs(false);
       }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
+
+  useEffect(() => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    if (!searchQuery.trim()) {
+      setSearchResults({ patients: [], nutritionists: [] });
+      return;
+    }
+    searchTimer.current = setTimeout(() => runSearch(searchQuery.trim()), 300);
+    return () => clearTimeout(searchTimer.current);
+  }, [searchQuery, runSearch]);
 
   const markAllRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
@@ -45,17 +80,86 @@ export default function TopBar({ title }) {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
   };
 
+  const handleSearchSelect = (person, type) => {
+    setSearchOpen(false);
+    setSearchQuery('');
+    if (type === 'nutritionist') {
+      navigate(`/nutritionists/${person._id}`);
+    } else if (person._id === user?._id) {
+      navigate('/profile');
+    } else {
+      navigate(`/messages`);
+    }
+  };
+
+  const hasResults = searchResults.patients.length > 0 || searchResults.nutritionists.length > 0;
+
   return (
     <header className="topbar">
       <h1 className="topbar-title">{title}</h1>
 
-      <div className="topbar-search">
+      <div className="topbar-search" ref={searchRef}>
         <FiSearch className="topbar-search-icon" />
-        <input type="text" placeholder="Search anything..." />
+        <input
+          type="text"
+          placeholder="Search patients or nutritionists..."
+          value={searchQuery}
+          onChange={e => { setSearchQuery(e.target.value); setSearchOpen(true); }}
+          onFocus={() => setSearchOpen(true)}
+        />
+        {searchQuery && (
+          <button className="search-clear-btn" onClick={() => { setSearchQuery(''); setSearchOpen(false); }}>
+            <FiX />
+          </button>
+        )}
+
+        {searchOpen && searchQuery.trim().length >= 2 && (
+          <div className="search-dropdown">
+            {searchLoading && (
+              <p className="search-empty">Searching...</p>
+            )}
+            {!searchLoading && !hasResults && (
+              <p className="search-empty">No results for "{searchQuery}"</p>
+            )}
+            {!searchLoading && searchResults.nutritionists.length > 0 && (
+              <div className="search-section">
+                <span className="search-section-label">Nutritionists</span>
+                {searchResults.nutritionists.map(n => (
+                  <button key={n._id} className="search-result-item" onClick={() => handleSearchSelect(n, 'nutritionist')}>
+                    <div className="avatar avatar-sm" style={{ background: getAvatarColor(n._id) }}>
+                      {getInitials(n.name)}
+                    </div>
+                    <div className="search-result-info">
+                      <strong>{n.name}</strong>
+                      <span>{n.nutritionistProfile?.title || 'Nutritionist'}</span>
+                    </div>
+                    <span className="badge badge-primary">Expert</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {!searchLoading && searchResults.patients.length > 0 && (
+              <div className="search-section">
+                <span className="search-section-label">Patients</span>
+                {searchResults.patients.map(p => (
+                  <button key={p._id} className="search-result-item" onClick={() => handleSearchSelect(p, 'patient')}>
+                    <div className="avatar avatar-sm" style={{ background: getAvatarColor(p._id) }}>
+                      {getInitials(p.name)}
+                    </div>
+                    <div className="search-result-info">
+                      <strong>{p.name}</strong>
+                      <span>{p.email}</span>
+                    </div>
+                    <FiUser className="search-result-icon" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="topbar-actions">
-        {/* Notification bell */}
         <div className="notif-wrapper" ref={notifRef}>
           <button
             className={`topbar-icon-btn ${showNotifs ? 'active' : ''}`}
@@ -110,7 +214,6 @@ export default function TopBar({ title }) {
           )}
         </div>
 
-        {/* Avatar */}
         <div
           className="topbar-avatar"
           onClick={() => navigate('/profile')}

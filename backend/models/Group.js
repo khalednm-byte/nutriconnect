@@ -10,6 +10,8 @@ const groupSchema = new mongoose.Schema({
 
   members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 
+  inviteCode: { type: String, unique: true, sparse: true },
+
   challengeIds: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Challenge' }],
 
   // Custom badges defined specifically for this group — separate from the

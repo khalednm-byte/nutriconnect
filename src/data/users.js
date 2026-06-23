@@ -39,7 +39,7 @@ export const users = [
     id: 'u2',
     name: 'Sarah Chen',
     avatar: null,
-    role: 'user',
+    role: 'patient',
     subscription: 'free',
     profile: {
       bio: 'Plant-based living 🌱 | Yoga lover',
@@ -54,7 +54,7 @@ export const users = [
     id: 'u3',
     name: 'James Wilson',
     avatar: null,
-    role: 'user',
+    role: 'patient',
     subscription: 'premium',
     profile: {
       bio: 'Marathon runner | Clean eating advocate',
@@ -69,7 +69,7 @@ export const users = [
     id: 'u4',
     name: 'Maria Garcia',
     avatar: null,
-    role: 'user',
+    role: 'patient',
     subscription: 'pro',
     profile: {
       bio: 'Mom of 2 | Meal prep queen 👑',
@@ -84,7 +84,7 @@ export const users = [
     id: 'u5',
     name: 'David Kim',
     avatar: null,
-    role: 'user',
+    role: 'patient',
     subscription: 'free',
     profile: {
       bio: 'Keto life | Gym 6x/week',

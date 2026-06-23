@@ -31,11 +31,20 @@ router.post('/', auth, async (req, res) => {
     if (!type || !content)
       return res.status(400).json({ message: 'Type and content are required' });
 
+    const safeImages = (images || [])
+      .filter(img => typeof img === 'string' && (img.startsWith('data:image/') || img.startsWith('http')))
+      .slice(0, 4);
+
+    for (const img of safeImages) {
+      if (img.startsWith('data:image/') && img.length > 1_500_000)
+        return res.status(400).json({ message: 'Each image must be under 1 MB' });
+    }
+
     const post = await Post.create({
       authorId:   req.user.id,
       authorName: req.user.name,
-      authorRole: req.user.role,
-      type, content, tags, images,
+      authorRole: req.user.role === 'user' ? 'patient' : req.user.role,
+      type, content, tags, images: safeImages,
     });
     res.status(201).json({ post });
   } catch (err) {

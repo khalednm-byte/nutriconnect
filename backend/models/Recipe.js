@@ -13,6 +13,7 @@ const recipeSchema = new mongoose.Schema({
     protein: { type: Number, default: 0 },
     carbs:   { type: Number, default: 0 },
     fat:     { type: Number, default: 0 },
+    fiber:   { type: Number, default: 0 },
   },
   rating:       { type: Number, default: 0, min: 0, max: 5 },
   reviewCount:  { type: Number, default: 0 },
