@@ -92,6 +92,12 @@ export const messagesAPI = {
     api.post(`/messages/conversations/${convId}/messages`, { text, type }),
 };
 
+// ── Setup (one-time admin bootstrap) ────────────────────────────────────────────
+export const setupAPI = {
+  getStatus:      ()  => api.get('/setup/status'),
+  bootstrapAdmin: ()  => api.post('/setup/bootstrap-admin'),
+};
+
 // ── Groups ────────────────────────────────────────────────────────────────────
 export const groupsAPI = {
   getMine:        ()             => api.get('/groups'),       // nutritionist's own groups

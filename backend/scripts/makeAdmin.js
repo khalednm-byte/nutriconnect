@@ -10,7 +10,7 @@ if (!email) { console.error('Usage: node scripts/makeAdmin.js your@email.com'); 
 mongoose.connect('mongodb://127.0.0.1:27017/nutriconnect')
   .then(async () => {
     const user = await User.findOneAndUpdate(
-      { email },
+      { email: email.toLowerCase() },
       { role: 'admin', subscription: 'premium' },
       { new: true }
     );

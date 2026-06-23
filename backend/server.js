@@ -26,6 +26,7 @@ app.use('/api/progress',     require('./routes/progress'));
 app.use('/api/challenges',   require('./routes/challenges'));
 app.use('/api/challenge-definitions', require('./routes/challengeDefinitions'));
 app.use('/api/groups',       require('./routes/groups'));
+app.use('/api/setup',        require('./routes/setup'));
 
 // ── Health check ──────────────────────────────────────────────────────────────
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
